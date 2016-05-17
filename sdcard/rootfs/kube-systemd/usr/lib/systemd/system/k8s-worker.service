@@ -17,6 +17,8 @@ ExecStart=/bin/sh -c "exec docker run \
         -v /var/lib/docker/:/var/lib/docker:rw \
         -v /var/lib/kubelet:/var/lib/kubelet:shared \
         -v /var/run:/var/run:rw \
+        -v /var/log/containers:/var/log/containers:rw \
+        -v /:/rootfs:ro \
         --privileged \
         kubernetesonarm/hyperkube \
         /hyperkube kubelet \
@@ -27,7 +29,9 @@ ExecStart=/bin/sh -c "exec docker run \
             --cluster-domain=${DNS_DOMAIN} \
             --v=2 \
             --address=0.0.0.0 \
-            --enable-server \
+            --containerized \
+            --enable-server=false \
+            --node-labels=nodeType=worker \
             --hostname-override=$(ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1) \
             --config=/etc/kubernetes/manifests"
 
